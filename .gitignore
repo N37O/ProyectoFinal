@@ -1,0 +1,8 @@
+.vs/
+bin/
+obj/
+*.vsidx
+*.usidx
+*.sisk
+*.db
+*.log
