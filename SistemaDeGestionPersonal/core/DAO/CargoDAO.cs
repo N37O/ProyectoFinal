@@ -8,5 +8,6 @@ namespace SistemaDeGestionPersonal.core.DAO
 {
     internal class CargoDAO
     {
+       
     }
 }
