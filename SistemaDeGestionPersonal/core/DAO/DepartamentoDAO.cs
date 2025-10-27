@@ -57,12 +57,12 @@ namespace SistemaDeGestionPersonal.core.DAO
 
         public int Insert(Departamentos departamento)
         {
-            try { con = OpenDb(); command = new SqlCommand("INSERT INTO Departamento (nombre) OUTPUT INSERTED.id VALUES (@nombre)", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = d.Nombre; return (int)command.ExecuteScalar(); }
+            try { con = OpenDb(); command = new SqlCommand("INSERT INTO Departamento (nombre) OUTPUT INSERTED.id VALUES (@nombre)", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = departamento.Nombre; return (int)command.ExecuteScalar(); }
             finally { command?.Dispose(); CloseDb(); }
         }
         public bool Update(Departamentos departamento)
         {
-            try { con = OpenDb(); command = new SqlCommand("UPDATE Departamento SET nombre = @nombre WHERE id = @id", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = d.Nombre; command.Parameters.Add("@id", SqlDbType.Int).Value = d.Id; return command.ExecuteNonQuery() == 1; }
+            try { con = OpenDb(); command = new SqlCommand("UPDATE Departamento SET nombre = @nombre WHERE id = @id", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = departamento.Nombre; command.Parameters.Add("@id", SqlDbType.Int).Value = departamento.Id; return command.ExecuteNonQuery() == 1; }
             finally { command?.Dispose(); CloseDb(); }
         }
     }

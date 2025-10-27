@@ -60,7 +60,7 @@ namespace SistemaDeGestionPersonal.core.DAO
         {
             Id = rd.GetInt32(0),
             NombreCompleto = rd.GetString(1),
-            DUI = rd.GetString(2),
+            Dui = rd.GetString(2),
             Telefono = rd.IsDBNull(3) ? null : rd.GetString(3),
             Estado = rd.GetString(4),
             DepartamentoId = rd.GetInt32(5),
@@ -94,7 +94,7 @@ namespace SistemaDeGestionPersonal.core.DAO
                     OUTPUT INSERTED.id
                     VALUES (@nombre, @dui, @telefono, @estado, @deptoId, @cargoId)", con);
                 command.Parameters.Add("@nombre", SqlDbType.NVarChar, 200).Value = empleado.NombreCompleto;
-                command.Parameters.Add("@dui", SqlDbType.VarChar, 10).Value = empleado.DUI;
+                command.Parameters.Add("@dui", SqlDbType.VarChar, 10).Value = empleado.Dui;
                 command.Parameters.Add("@telefono", SqlDbType.VarChar, 10).Value = (object?)empleado.Telefono ?? DBNull.Value;
                 command.Parameters.Add("@estado", SqlDbType.NVarChar, 20).Value = empleado.Estado;
                 command.Parameters.Add("@deptoId", SqlDbType.Int).Value = empleado.DepartamentoId;
@@ -110,7 +110,7 @@ namespace SistemaDeGestionPersonal.core.DAO
 
         public bool Update(Empleado empleado)
         {
-            if (e.Estado == "Activo" && (empleado.CargoId <= 0 || empleado.DepartamentoId <= 0))
+            if (empleado.Estado == "Activo" && (empleado.CargoId <= 0 || empleado.DepartamentoId <= 0))
                 throw new ApplicationException("Un empleado activo debe tener cargo y departamento asignados.");
 
             try
@@ -121,13 +121,13 @@ namespace SistemaDeGestionPersonal.core.DAO
                     SET nombreCompleto = @nombre, DUI = @dui, Telefono = @telefono,
                         Estado = @estado, departamentoId = @deptoId, cargoId = @cargoId
                     WHERE id = @id", con);
-                command.Parameters.Add("@id", SqlDbType.Int).Value = e.Id;
-                command.Parameters.Add("@nombre", SqlDbType.NVarChar, 200).Value = e.NombreCompleto;
-                command.Parameters.Add("@dui", SqlDbType.VarChar, 10).Value = e.DUI;
-                command.Parameters.Add("@telefono", SqlDbType.VarChar, 10).Value = (object?)e.Telefono ?? DBNull.Value;
-                command.Parameters.Add("@estado", SqlDbType.NVarChar, 20).Value = e.Estado;
-                command.Parameters.Add("@deptoId", SqlDbType.Int).Value = e.DepartamentoId;
-                command.Parameters.Add("@cargoId", SqlDbType.Int).Value = e.CargoId;
+                command.Parameters.Add("@id", SqlDbType.Int).Value = empleado.Id;
+                command.Parameters.Add("@nombre", SqlDbType.NVarChar, 200).Value = empleado.NombreCompleto;
+                command.Parameters.Add("@dui", SqlDbType.VarChar, 10).Value = empleado.Dui;
+                command.Parameters.Add("@telefono", SqlDbType.VarChar, 10).Value = (object?)empleado.Telefono ?? DBNull.Value;
+                command.Parameters.Add("@estado", SqlDbType.NVarChar, 20).Value = empleado.Estado;
+                command.Parameters.Add("@deptoId", SqlDbType.Int).Value = empleado.DepartamentoId;
+                command.Parameters.Add("@cargoId", SqlDbType.Int).Value = empleado.CargoId;
                 return command.ExecuteNonQuery() == 1;
             }
             finally { command?.Dispose(); CloseDb(); }
@@ -157,7 +157,7 @@ namespace SistemaDeGestionPersonal.core.DAO
                 {
                     Id = rd.GetInt32(0),
                     NombreCompleto = rd.GetString(1),
-                    DUI = rd.GetString(2),
+                    Dui = rd.GetString(2),
                     Telefono = rd.IsDBNull(3) ? null : rd.GetString(3),
                     Estado = rd.GetString(4),
                     DepartamentoId = rd.GetInt32(5),
