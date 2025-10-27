@@ -1,7 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 using SistemaDeGestionPersonal.core.Clases;
+using SistemaDeGestionPersonal.core.Lip;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,110 +12,143 @@ namespace SistemaDeGestionPersonal.core.DAO
 {
     internal class CargoDAO : Cnn, ICargoDAO
     {
+        private SqlConnection con = null;
+        private SqlCommand command = null;
+
         public bool Delete(int id)
         {
-            using (var conn = Conexion.ObtenerConexion())
+            try
             {
-                conn.Open();
-                using (var cmd = new SqlCommand("DELETE FROM Cargo WHERE id = @id", conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                con = OpenDb();
+                command = new SqlCommand("DELETE FROM Cargo WHERE id = @id", con);
+                command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                return command.ExecuteNonQuery() == 1;
+            }
+            finally
+            {
+                command?.Dispose();
+                CloseDb();
             }
         }
 
         public List<Cargo> GetAll(string filtro = "")
         {
             var lista = new List<Cargo>();
-            string sql = "SELECT id, nombre, nivel, salarioBase FROM Cargo";
-            if (!string.IsNullOrEmpty(filtro))
-                sql += " WHERE nombre LIKE @filtro";
+            SqlDataReader rd = null;
 
-            using (var conn = Conexion.ObtenerConexion())
+            try
             {
-                conn.Open();
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    if (!string.IsNullOrEmpty(filtro))
-                        cmd.Parameters.AddWithValue("@filtro", $"%{filtro}%");
+                con = OpenDb();
+                string sql = @"
+                    SELECT id, nombre, nivel, salarioBase 
+                    FROM Cargo /** where **/
+                    ORDER BY id;";
 
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            lista.Add(new Cargo
-                            {
-                                Id = (int)reader["id"],
-                                Nombre = reader["nombre"].ToString(),
-                                Nivel = reader["nivel"].ToString(),
-                                SalarioBase = (decimal)reader["salarioBase"]
-                            });
-                        }
-                    }
+                if (!string.IsNullOrEmpty(filtro))
+                    sql = sql.Replace("/** where **/", " WHERE nombre LIKE @f");
+                else
+                    sql = sql.Replace("/** where **/", string.Empty);
+
+                command = new SqlCommand(sql, con);
+                if (!string.IsNullOrEmpty(filtro))
+                    command.Parameters.Add("@f", SqlDbType.NVarChar, 100).Value = $"%{filtro}%";
+
+                rd = command.ExecuteReader();
+                while (rd.Read())
+                {
+                    lista.Add(Map(rd));
                 }
+            }
+            finally
+            {
+                rd?.Close();
+                command?.Dispose();
+                CloseDb();
             }
             return lista;
         }
 
+        private Cargo Map(SqlDataReader rd) =>  new Cargo
+         {
+            Id = rd.GetInt32(0),
+            Nombre = rd.GetString(1),
+            Nivel = rd.IsDBNull(2) ? null : rd.GetString(2),
+            SalarioBase = rd.GetDecimal(3)
+        };
+              
+
+
         public Cargo GetById(int id)
         {
-            using (var conn = Conexion.ObtenerConexion())
+            SqlDataReader rd = null;
+            try
             {
-                conn.Open();
-                string sql = "SELECT id, nombre, nivel, salarioBase FROM Cargo WHERE id = @id";
-                using (var cmd = new SqlCommand(sql, conn))
+                con = OpenDb();
+                command = new SqlCommand("SELECT id, nombre, nivel, salarioBase FROM Cargo WHERE id = @id", con);
+                command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                rd = command.ExecuteReader(CommandBehavior.SingleRow);
+                if (!rd.Read())
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new Cargo
-                            {
-                                Id = (int)reader["id"],
-                                Nombre = reader["nombre"].ToString(),
-                                Nivel = reader["nivel"].ToString(),
-                                SalarioBase = (decimal)reader["salarioBase"]
-                            };
-                        }
-                    }
+                    return null;
+
                 }
+                return Map(rd);
             }
-            return null;
+            finally
+            {
+                rd?.Close();
+                command?.Dispose();
+                CloseDb();
+            }
         }
 
         public int Insert(Cargo cargo)
         {
-            using (var conn = Conexion.ObtenerConexion())
+            try
             {
-                conn.Open();
-                string sql = "INSERT INTO Cargo (nombre, nivel, salarioBase) OUTPUT INSERTED.id VALUES (@nombre, @nivel, @salarioBase)";
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", cargo.Nombre);
-                    cmd.Parameters.AddWithValue("@nivel", cargo.Nivel ?? "");
-                    cmd.Parameters.AddWithValue("@salarioBase", cargo.SalarioBase);
-                    return (int)cmd.ExecuteScalar();
-                }
+                con = OpenDb();
+                command = new SqlCommand(@"
+                    INSERT INTO Cargo (nombre, nivel, salarioBase)
+                    OUTPUT INSERTED.id
+                    VALUES (@nombre, @nivel, @salarioBase);", con);
+
+                command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = cargo.Nombre;
+                command.Parameters.Add("@nivel", SqlDbType.NVarChar, 50).Value = (object?)cargo.Nivel ?? DBNull.Value;
+                command.Parameters.Add("@salarioBase", SqlDbType.Decimal).Value = cargo.SalarioBase;
+
+                var result = command.ExecuteScalar();
+                return Convert.ToInt32(result);
+            }
+            finally
+            {
+                command?.Dispose();
+                CloseDb();
             }
         }
 
         public bool Update(Cargo cargo)
         {
-            using (var conn = Conexion.ObtenerConexion())
+            try
             {
-                conn.Open();
-                string sql = "UPDATE Cargo SET nombre = @nombre, nivel = @nivel, salarioBase = @salarioBase WHERE id = @id";
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", cargo.Id);
-                    cmd.Parameters.AddWithValue("@nombre", cargo.Nombre);
-                    cmd.Parameters.AddWithValue("@nivel", cargo.Nivel ?? "");
-                    cmd.Parameters.AddWithValue("@salarioBase", cargo.SalarioBase);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                con = OpenDb();
+                command = new SqlCommand(@"
+                    UPDATE Cargo 
+                    SET nombre = @nombre, nivel = @nivel, salarioBase = @salarioBase
+                    WHERE id = @id;", con);
+
+                command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = cargo.Nombre;
+                command.Parameters.Add("@nivel", SqlDbType.NVarChar, 50).Value = (object?)cargo.Nivel ?? DBNull.Value;
+                command.Parameters.Add("@salarioBase", SqlDbType.Decimal).Value = cargo.SalarioBase;
+                command.Parameters.Add("@id", SqlDbType.Int).Value = cargo.Id;
+
+                return command.ExecuteNonQuery() == 1;
+            }
+            finally
+            {
+                command?.Dispose();
+                CloseDb();
             }
         }
     }
+    
 }

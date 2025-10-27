@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace SistemaDeGestionPersonal.core.DAO
 {
-    internal interface IDepartamentoDAO
+    internal interface IAsistenciasDAO
     {
-        int Insert(Departamentos departamento);
-        bool Update(Departamentos departamento);
+        int Insert(Asistencias asistencia);
+        bool Update(Asistencias asistencia);
         bool Delete(int id);
-        Departamentos GetById(int id);
-        List<Departamentos> GetAll(string filtro = "");
+        Asistencias GetById(int id);
+        List<Asistencias> GetAll(string filtro = "");
     }
 }

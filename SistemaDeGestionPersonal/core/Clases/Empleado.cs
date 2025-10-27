@@ -15,6 +15,10 @@ namespace SistemaDeGestionPersonal.core.Clases
         private string estado;
         private int departamentoId;
         private int cargoId;
+        private string nombreDepartamento;
+        private string nombreCargo;
+
+
 
         public int Id { get => id; set => id = value; }
         public string NombreCompleto { get => nombreCompleto; set => nombreCompleto = value; }
@@ -23,5 +27,7 @@ namespace SistemaDeGestionPersonal.core.Clases
         public string Estado { get => estado; set => estado = value; }
         public int DepartamentoId { get => departamentoId; set => departamentoId = value; }
         public int CargoId { get => cargoId; set => cargoId = value; }
+        public string NombreCargo { get => nombreCargo; set => nombreCargo = value; }
+        public string NombreDepartamento { get => nombreDepartamento; set => nombreDepartamento = value; }
     }
 }

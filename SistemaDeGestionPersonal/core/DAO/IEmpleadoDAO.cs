@@ -9,11 +9,12 @@ namespace SistemaDeGestionPersonal.core.DAO
 {
     internal interface IEmpleadoDAO
     {
-        int Insert(Cargo cargo);
-        bool Update(Cargo cargo);
+        int Insert(Empleado empleado);
+        bool Update(Empleado empleado);
         bool Delete(int id);
-        Cargo GetById(int id);
-        List<Cargo> GetAll(string filtro = "");
+        Empleado GetById(int id);
+        List<Empleado> GetAll(string filtro = "");
+        List<Empleado> GetAllWithRelations(string filtro = "");
 
     }
 }
