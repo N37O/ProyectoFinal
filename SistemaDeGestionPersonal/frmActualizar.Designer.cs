@@ -38,9 +38,10 @@
             mtxtTelefono = new MaskedTextBox();
             mtxtDUI = new MaskedTextBox();
             label2 = new Label();
-            textBox1 = new TextBox();
+            txtNombre = new TextBox();
             label1 = new Label();
             btnActualisar = new Button();
+            btnEliminar = new Button();
             SuspendLayout();
             // 
             // cbxEstado
@@ -136,13 +137,13 @@
             label2.TabIndex = 26;
             label2.Text = "DUI:";
             // 
-            // textBox1
+            // txtNombre
             // 
-            textBox1.BackColor = SystemColors.ScrollBar;
-            textBox1.Location = new Point(246, 44);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(214, 29);
-            textBox1.TabIndex = 25;
+            txtNombre.BackColor = SystemColors.ScrollBar;
+            txtNombre.Location = new Point(246, 44);
+            txtNombre.Name = "txtNombre";
+            txtNombre.Size = new Size(214, 29);
+            txtNombre.TabIndex = 25;
             // 
             // label1
             // 
@@ -162,12 +163,25 @@
             btnActualisar.TabIndex = 36;
             btnActualisar.Text = "Actualizar";
             btnActualisar.UseVisualStyleBackColor = false;
+            btnActualisar.Click += btnActualisar_Click;
+            // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = SystemColors.ScrollBar;
+            btnEliminar.Location = new Point(265, 334);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(195, 63);
+            btnEliminar.TabIndex = 37;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
             // 
             // frmActualizar
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnEliminar);
             Controls.Add(btnActualisar);
             Controls.Add(cbxEstado);
             Controls.Add(label6);
@@ -179,7 +193,7 @@
             Controls.Add(mtxtTelefono);
             Controls.Add(mtxtDUI);
             Controls.Add(label2);
-            Controls.Add(textBox1);
+            Controls.Add(txtNombre);
             Controls.Add(label1);
             Name = "frmActualizar";
             Text = "Actualizar";
@@ -199,8 +213,9 @@
         private MaskedTextBox mtxtTelefono;
         private MaskedTextBox mtxtDUI;
         private Label label2;
-        private TextBox textBox1;
+        private TextBox txtNombre;
         private Label label1;
         private Button btnActualisar;
+        private Button btnEliminar;
     }
 }
