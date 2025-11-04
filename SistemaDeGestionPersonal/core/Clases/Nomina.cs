@@ -16,9 +16,9 @@ namespace SistemaDeGestionPersonal.core.Clases
         private int diasPresentes;
         private int diasJustificados;
         private int diasTarde;
-        private int diasAsuente;
+        private int diasAsuentes;
         private decimal descuentosTarde;
-        private decimal descuentosAsuente;
+        private decimal descuentosAusente;
         private decimal pagoNeto;
 
         public int EmpleadoId { get => empleadoId; set => empleadoId = value; }
@@ -28,9 +28,9 @@ namespace SistemaDeGestionPersonal.core.Clases
         public int DiasPresentes { get => diasPresentes; set => diasPresentes = value; }
         public int DiasJustificados { get => diasJustificados; set => diasJustificados = value; }
         public int DiasTarde { get => diasTarde; set => diasTarde = value; }
-        public int DiasAsuente { get => diasAsuente; set => diasAsuente = value; }
+        public int DiasAusentes { get => diasAsuentes; set => diasAsuentes = value; }
         public decimal DescuentosTarde { get => descuentosTarde; set => descuentosTarde = value; }
-        public decimal DescuentosAsuente { get => descuentosAsuente; set => descuentosAsuente = value; }
+        public decimal DescuentosAusente { get => descuentosAusente; set => descuentosAusente = value; }
         public decimal PagoNeto { get => pagoNeto; set => pagoNeto = value; }
 
     }

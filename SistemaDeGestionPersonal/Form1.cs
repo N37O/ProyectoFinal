@@ -195,15 +195,13 @@ namespace SistemaDeGestionPersonal
             cbxPermiso.SelectedIndex = -1;
         }
 
-        #endregion
 
-        #region Eventos - Reportes
 
-        
+
 
         private void btnExportarExcel_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Exportación a Excel no implementada aún.");
+
         }
 
         #endregion
@@ -285,20 +283,35 @@ namespace SistemaDeGestionPersonal
 
         private void btnEliminar_Click_1(object sender, EventArgs e)
         {
-            if (empleadoSeleccionadoId == -1)
+            if (dgvEmpleados.CurrentRow == null)
             {
-                MessageBox.Show("Seleccione un empleado.");
+                MessageBox.Show("Debe seleccionar un registro.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
-            if (MessageBox.Show("¿Desea dar de baja a este empleado?\nSi tiene historial, solo se marcará como inactivo.", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            // Obtener el objeto Empleado directamente del DataGridView
+            if (dgvEmpleados.CurrentRow.DataBoundItem is Empleado empleado)
             {
-                if (empleadoDAO.Delete(empleadoSeleccionadoId))
+                if (MessageBox.Show("¿Desea dar de baja a este empleado?\nSe marcará como inactivo (no se eliminará).", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    LimpiarCamposEmpleado();
+                    try
+                    {
+                        // Cambiar el estado a "Desactivo"
+                        empleado.Estado = "Desactivo";
+                        // Actualizar en la base de datos
+                        empleadoDAO.Update(empleado);
+                        MessageBox.Show("Empleado dado de baja correctamente (marcado como inactivo).");
+                        LimpiarCamposEmpleado();
+                        CargarEmpleados();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error al dar de baja: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-                MessageBox.Show("Empleado dado de baja correctamente.");
-                CargarEmpleados();
+            }
+            else
+            {
+                MessageBox.Show("No se pudo obtener los datos del empleado seleccionado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -347,75 +360,78 @@ namespace SistemaDeGestionPersonal
         }
 
         private void btnGenerarReporte_Click_1(object sender, EventArgs e)
-        {string tipo = comboBox1.SelectedItem?.ToString();
-    if (string.IsNullOrEmpty(tipo))
-    {
-        MessageBox.Show("Seleccione un tipo de reporte.", "Aviso", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        return;
-    }
-
-    try
-    {
-        switch (tipo)
         {
-            case "Planilla":
-                var nominaService = new NominaDAO();
-                var nomina = nominaService.CalcularNominaMensual(dtpDesde.Value);
-                dgvResultadosReportes.DataSource = nomina;
-                break;
+            string tipo = comboBox1.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(tipo))
+            {
+                MessageBox.Show("Seleccione un tipo de reporte.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            case "Asistencia":
-                // Obtener asistencias entre dtpDesde y dtpHasta
-                DateTime desde = dtpDesde.Value.Date;
-                DateTime hasta = dtpHasta.Value.Date;
-
-                if (desde > hasta)
+            try
+            {
+                switch (tipo)
                 {
-                    MessageBox.Show("La fecha 'Desde' no puede ser mayor que 'Hasta'.", "Error", 
-                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    case "Planilla":
+                        var nominaService = new NominaDAO();
+                        var nomina = nominaService.CalcularNominaMensual(dtpDesde.Value);
+
+                        ConfigurarDataGridViewReportePlanilla();
+                        dgvResultadosReportes.DataSource = nomina;
+                        break;
+
+                    case "Asistencia":
+                        // Obtener asistencias entre dtpDesde y dtpHasta
+                        DateTime desde = dtpDesde.Value.Date;
+                        DateTime hasta = dtpHasta.Value.Date;
+
+                        if (desde > hasta)
+                        {
+                            MessageBox.Show("La fecha 'Desde' no puede ser mayor que 'Hasta'.", "Error",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        var asistencias = asistenciaDAO.GetAll(); // Cargar todas
+                        var asistenciasFiltradas = new List<Asistencias>();
+
+                        foreach (var a in asistencias)
+                        {
+                            // Obtener nombre del empleado para mostrar
+                            var emp = empleadoDAO.GetById(a.EmpleadoId);
+                            a.NombreEmpleado = emp?.NombreCompleto ?? "Desconocido";
+
+                            if (a.Fecha >= desde && a.Fecha <= hasta)
+                            {
+                                asistenciasFiltradas.Add(a);
+                            }
+                        }
+
+                        // Configurar columnas para asistencias
+                        ConfigurarDataGridViewReporteAsistencia();
+                        dgvResultadosReportes.DataSource = asistenciasFiltradas;
+                        break;
+
+                    case "Empleados por cargo":
+                        var empleados = empleadoDAO.GetAllWithRelations();
+
+                        // Configurar columnas para empleados
+                        ConfigurarDataGridViewReporteEmpleados();
+                        dgvResultadosReportes.DataSource = empleados;
+                        break;
+
+                    default:
+                        MessageBox.Show("Tipo de reporte no reconocido.", "Error",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
                 }
-
-                var asistencias = asistenciaDAO.GetAll(); // Cargar todas
-                var asistenciasFiltradas = new List<Asistencias>();
-
-                foreach (var a in asistencias)
-                {
-                    // Obtener nombre del empleado para mostrar
-                    var emp = empleadoDAO.GetById(a.EmpleadoId);
-                    a.NombreEmpleado = emp?.NombreCompleto ?? "Desconocido";
-
-                    if (a.Fecha >= desde && a.Fecha <= hasta)
-                    {
-                        asistenciasFiltradas.Add(a);
-                    }
-                }
-
-                // Configurar columnas para asistencias
-                ConfigurarDataGridViewReporteAsistencia();
-                dgvResultadosReportes.DataSource = asistenciasFiltradas;
-                break;
-
-            case "Empleados por cargo":
-                var empleados = empleadoDAO.GetAllWithRelations();
-                
-                // Configurar columnas para empleados
-                ConfigurarDataGridViewReporteEmpleados();
-                dgvResultadosReportes.DataSource = empleados;
-                break;
-
-            default:
-                MessageBox.Show("Tipo de reporte no reconocido.", "Error", 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al generar el reporte:\n{ex.Message}", "Error",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-                break;
-        }
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show($"Error al generar el reporte:\n{ex.Message}", "Error", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-    }
+            }
 
         }
 
@@ -424,14 +440,14 @@ namespace SistemaDeGestionPersonal
             dgvResultadosReportes.AutoGenerateColumns = false;
             dgvResultadosReportes.Columns.Clear();
 
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "ID", Visible = false });
+
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Nombre" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DUI", HeaderText = "DUI" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Telefono", HeaderText = "Teléfono" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Estado", HeaderText = "Estado" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreDepartamento", HeaderText = "Departamento" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCargo", HeaderText = "Cargo" });
- 
+
         }
 
         private void ConfigurarDataGridViewReporteAsistencia()
@@ -439,17 +455,35 @@ namespace SistemaDeGestionPersonal
             dgvResultadosReportes.AutoGenerateColumns = false;
             dgvResultadosReportes.Columns.Clear();
 
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "ID", Visible = false });
+
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreEmpleado", HeaderText = "Empleado" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Fecha", HeaderText = "Fecha", DefaultCellStyle = { Format = "dd/MM/yyyy" } });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "HoraEntrada", HeaderText = "Entrada", DefaultCellStyle = { Format = @"hh\:mm" } });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "HoraSalida", HeaderText = "Salida", DefaultCellStyle = { Format = @"hh\:mm" } });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Estado", HeaderText = "Estado" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Nota", HeaderText = "Nota" });
+        }
+        private void ConfigurarDataGridViewReportePlanilla()
+        {
+            dgvResultadosReportes.AutoGenerateColumns = false;
+            dgvResultadosReportes.Columns.Clear();
+
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Empleado" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalarioBase", HeaderText = "Salario Base", DefaultCellStyle = { Format = "C2" } });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasPresentes", HeaderText = "Días Presente" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasJustificados", HeaderText = "Justificados" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasTarde", HeaderText = "Tardes" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasAusentes", HeaderText = "Ausencias" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DescuentosTarde", HeaderText = "Desc. Tardes", DefaultCellStyle = { Format = "C2" } });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DescuentosAusente", HeaderText = "Desc. Ausencias", DefaultCellStyle = { Format = "C2" } });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PagoNeto", HeaderText = "Pago Neto", DefaultCellStyle = { Format = "C2" } });
         }
 
-       
-    }   
+        private void dgvAsistencias_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
+        }
+    }
 }
+
+
 

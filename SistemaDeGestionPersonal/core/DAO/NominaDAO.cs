@@ -59,14 +59,14 @@ namespace SistemaDeGestionPersonal.core.DAO
                         DiasPresentes = rd.GetInt32(3),
                         DiasJustificados = rd.GetInt32(4),
                         DiasTarde = rd.GetInt32(5),
-                        DiasAsuente = rd.GetInt32(6),
+                        DiasAusentes = rd.GetInt32(6),
                         DiasLaborables = diasLaborables
                     };
 
                     decimal salarioDiario = nom.SalarioBase / 30;
-                    nom.DescuentosAsuente = nom.DiasAsuente * salarioDiario;
+                    nom.DescuentosAusente = nom.DiasAusentes * salarioDiario;
                     nom.DescuentosTarde = nom.DiasTarde * (salarioDiario * 0.30m);
-                    nom.PagoNeto = Math.Max(0, nom.SalarioBase - nom.DescuentosAsuente - nom.DescuentosTarde);
+                    nom.PagoNeto = Math.Max(0, nom.SalarioBase - nom.DescuentosAusente - nom.DescuentosTarde);
 
                     lista.Add(nom);
                 }

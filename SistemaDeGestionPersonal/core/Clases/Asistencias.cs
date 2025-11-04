@@ -13,7 +13,6 @@ namespace SistemaDeGestionPersonal.core.Clases
         private TimeSpan horaEntrada;
         private TimeSpan horaSalida;
         private string estado;
-        private string nota;
         private int empleadoId;
         private string nombreEmpleado;
 
@@ -22,7 +21,6 @@ namespace SistemaDeGestionPersonal.core.Clases
         public TimeSpan HoraEntrada { get => horaEntrada; set => horaEntrada = value; }
         public TimeSpan HoraSalida { get => horaSalida; set => horaSalida = value; }
         public string Estado { get => estado; set => estado = value; }
-        public string Nota { get => nota; set => nota = value; }
         public int EmpleadoId { get => empleadoId; set => empleadoId = value; }
         public string NombreEmpleado { get => nombreEmpleado; set => nombreEmpleado = value; }
     }

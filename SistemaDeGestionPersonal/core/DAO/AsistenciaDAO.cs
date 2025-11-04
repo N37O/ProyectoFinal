@@ -27,7 +27,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             try
             {
                 con = OpenDb();
-                string sql = "SELECT id, fecha, horaEntrada, horaSalida, estado, nota, empleadoId FROM Asistencia /** where **/ ORDER BY fecha DESC";
+                string sql = "SELECT id, fecha, horaEntrada, horaSalida, estado, empleadoId FROM Asistencia /** where **/ ORDER BY fecha DESC";
                 if (!string.IsNullOrEmpty(filtro)) sql = sql.Replace("/** where **/", " WHERE CAST(fecha AS VARCHAR) LIKE @f OR estado LIKE @f");
                 else sql = sql.Replace("/** where **/", "");
                 command = new SqlCommand(sql, con);
@@ -40,8 +40,7 @@ namespace SistemaDeGestionPersonal.core.DAO
                     HoraEntrada = rd.GetTimeSpan(2),
                     HoraSalida = rd.GetTimeSpan(3),
                     Estado = rd.GetString(4),
-                    Nota = rd.IsDBNull(5) ? null : rd.GetString(5),
-                    EmpleadoId = rd.GetInt32(6)
+                    EmpleadoId = rd.GetInt32(5)
                 });
             }
             finally { rd?.Close(); command?.Dispose(); CloseDb(); }
@@ -54,7 +53,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             try
             {
                 con = OpenDb();
-                command = new SqlCommand("SELECT id, fecha, horaEntrada, horaSalida, estado, nota, empleadoId FROM Asistencia WHERE id = @id", con);
+                command = new SqlCommand("SELECT id, fecha, horaEntrada, horaSalida, estado, empleadoId FROM Asistencia WHERE id = @id", con);
                 command.Parameters.Add("@id", SqlDbType.Int).Value = id;
                 rd = command.ExecuteReader();
                 if (!rd.Read()) return null;
@@ -65,8 +64,7 @@ namespace SistemaDeGestionPersonal.core.DAO
                     HoraEntrada = rd.GetTimeSpan(2),
                     HoraSalida = rd.GetTimeSpan(3),
                     Estado = rd.GetString(4),
-                    Nota = rd.IsDBNull(5) ? null : rd.GetString(5),
-                    EmpleadoId = rd.GetInt32(6)
+                    EmpleadoId = rd.GetInt32(5)
                 };
             }
             finally { rd?.Close(); command?.Dispose(); CloseDb(); }
@@ -78,14 +76,13 @@ namespace SistemaDeGestionPersonal.core.DAO
             {
                 con = OpenDb();
                 command = new SqlCommand(@"
-                    INSERT INTO Asistencia (fecha, horaEntrada, horaSalida, estado, nota, empleadoId)
+                    INSERT INTO Asistencia (fecha, horaEntrada, horaSalida, estado, empleadoId)
                     OUTPUT INSERTED.id
-                    VALUES (@fecha, @horaE, @horaS, @estado, @nota, @empId)", con);
+                    VALUES (@fecha, @horaE, @horaS, @estado, @empId)", con);
                 command.Parameters.Add("@fecha", SqlDbType.Date).Value = asistencia.Fecha;
                 command.Parameters.Add("@horaE", SqlDbType.Time).Value = asistencia.HoraEntrada;
                 command.Parameters.Add("@horaS", SqlDbType.Time).Value = asistencia.HoraSalida;
                 command.Parameters.Add("@estado", SqlDbType.NVarChar, 20).Value = asistencia.Estado;
-                command.Parameters.Add("@nota", SqlDbType.NVarChar, 500).Value = (object?)asistencia.Nota ?? DBNull.Value;
                 command.Parameters.Add("@empId", SqlDbType.Int).Value = asistencia.EmpleadoId;
                 return (int)command.ExecuteScalar();
             }
@@ -106,14 +103,13 @@ namespace SistemaDeGestionPersonal.core.DAO
                 command = new SqlCommand(@"
                     UPDATE Asistencia 
                     SET fecha = @fecha, horaEntrada = @horaE, horaSalida = @horaS,
-                        estado = @estado, nota = @nota, empleadoId = @empId
+                        estado = @estado, empleadoId = @empId
                     WHERE id = @id", con);
                 command.Parameters.Add("@id", SqlDbType.Int).Value = asistencia.Id;
                 command.Parameters.Add("@fecha", SqlDbType.Date).Value = asistencia.Fecha;
                 command.Parameters.Add("@horaE", SqlDbType.Time).Value = asistencia.HoraEntrada;
                 command.Parameters.Add("@horaS", SqlDbType.Time).Value = asistencia.HoraSalida;
                 command.Parameters.Add("@estado", SqlDbType.NVarChar, 20).Value = asistencia.Estado;
-                command.Parameters.Add("@nota", SqlDbType.NVarChar, 500).Value = (object?)asistencia.Nota ?? DBNull.Value;
                 command.Parameters.Add("@empId", SqlDbType.Int).Value = asistencia.EmpleadoId;
                 return command.ExecuteNonQuery() == 1;
             }
