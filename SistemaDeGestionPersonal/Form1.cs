@@ -1,5 +1,7 @@
 using SistemaDeGestionPersonal.core.Clases;
 using SistemaDeGestionPersonal.core.DAO;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace SistemaDeGestionPersonal
 {
@@ -93,6 +95,12 @@ namespace SistemaDeGestionPersonal
             // Reportes Tab
             comboBox1.Items.Clear();
             comboBox1.Items.AddRange(new string[] { "Asistencia", "Planilla", "Empleados por cargo" });
+
+            // Agregar combo para cargo en reportes 
+            cbxCargarReporte.DisplayMember = "Nombre";
+            cbxCargarReporte.ValueMember = "Id";
+            cbxCargarReporte.DataSource = cargos;
+            cbxCargarReporte.Visible = false;
         }
 
         private void CargarEmpleados()
@@ -482,8 +490,87 @@ namespace SistemaDeGestionPersonal
         {
 
         }
+        // Exportar a Excel
+        private void btnExportar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Verificar si hay datos en el grid
+                if (dgvAsistencias.Rows.Count == 0)
+                {
+                    MessageBox.Show("No hay datos para exportar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Crear un nuevo libro de Excel
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Asistencias");
+
+                    // Agregar encabezados (usando los HeaderText de las columnas visibles)
+                    for (int i = 0; i < dgvAsistencias.Columns.Count; i++)
+                    {
+                        if (dgvAsistencias.Columns[i].Visible)
+                        {
+                            worksheet.Cell(1, i + 1).Value = dgvAsistencias.Columns[i].HeaderText;
+                        }
+                    }
+
+                    // Agregar filas de datos
+                    for (int row = 0; row < dgvAsistencias.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dgvAsistencias.Columns.Count; col++)
+                        {
+                            if (dgvAsistencias.Columns[col].Visible)
+                            {
+                                var cellValue = dgvAsistencias.Rows[row].Cells[col].Value;
+                                worksheet.Cell(row + 2, col + 1).Value = cellValue?.ToString() ?? "";
+                            }
+                        }
+                    }
+
+                    // Autoajustar columnas para mejor visualización
+                    worksheet.Columns().AdjustToContents();
+
+                    // Definir la ruta del archivo (ej. en el escritorio)
+                    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                    string fileName = $"Asistencias_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.xlsx";
+                    string filePath = Path.Combine(desktopPath, fileName);
+
+                    // Guardar el archivo
+                    workbook.SaveAs(filePath);
+
+                    // Mostrar mensaje de éxito
+                    MessageBox.Show($"Archivo Excel generado correctamente en: {filePath}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al generar el archivo Excel: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void label15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cbxCargoReporte_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void cbxCargarReporte_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void cbxCargarReporte_Click(object sender, EventArgs e)
+        {
+            string tipo = comboBox1.SelectedItem?.ToString();
+            cbxCargarReporte.Visible = (tipo == "Empleados por cargo");
+        }
     }
 }
+
 
 
 
