@@ -1,7 +1,10 @@
+using ClosedXML.Excel;
 using SistemaDeGestionPersonal.core.Clases;
 using SistemaDeGestionPersonal.core.DAO;
-using ClosedXML.Excel;
+
 using System.IO;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.Linq;
 
 namespace SistemaDeGestionPersonal
 {
@@ -100,7 +103,7 @@ namespace SistemaDeGestionPersonal
             cbxCargarReporte.DisplayMember = "Nombre";
             cbxCargarReporte.ValueMember = "Id";
             cbxCargarReporte.DataSource = cargos;
-            cbxCargarReporte.Visible = false;
+            cbxCargarReporte.Visible = true;
         }
 
         private void CargarEmpleados()
@@ -379,14 +382,20 @@ namespace SistemaDeGestionPersonal
 
             try
             {
+                int? cargoIdSeleccionado = cbxCargarReporte.SelectedValue as int?;
                 switch (tipo)
                 {
                     case "Planilla":
                         var nominaService = new NominaDAO();
                         var nomina = nominaService.CalcularNominaMensual(dtpDesde.Value);
 
+                        //Filtrar por cargo si está seleccionado
+                            if (cargoIdSeleccionado.HasValue)
+                            nomina = nomina.Where(n => n.CargoId == cargoIdSeleccionado.Value).ToList();
+
                         ConfigurarDataGridViewReportePlanilla();
                         dgvResultadosReportes.DataSource = nomina;
+                        dgvResultadosReportes.Refresh();
                         break;
 
                     case "Asistencia":
@@ -410,23 +419,31 @@ namespace SistemaDeGestionPersonal
                             var emp = empleadoDAO.GetById(a.EmpleadoId);
                             a.NombreEmpleado = emp?.NombreCompleto ?? "Desconocido";
 
+
                             if (a.Fecha >= desde && a.Fecha <= hasta)
                             {
-                                asistenciasFiltradas.Add(a);
+                                if (!cargoIdSeleccionado.HasValue || emp?.CargoId == cargoIdSeleccionado.Value)
+                                    asistenciasFiltradas.Add(a);
                             }
                         }
 
                         // Configurar columnas para asistencias
                         ConfigurarDataGridViewReporteAsistencia();
                         dgvResultadosReportes.DataSource = asistenciasFiltradas;
+                        dgvResultadosReportes.Refresh();
                         break;
 
                     case "Empleados por cargo":
                         var empleados = empleadoDAO.GetAllWithRelations();
 
+                        // Filtrar por cargo seleccionado si hay uno elegido
+                            if (cargoIdSeleccionado.HasValue)
+                                empleados = empleados.Where(emp => emp.CargoId == cargoIdSeleccionado.Value).ToList();
+
                         // Configurar columnas para empleados
                         ConfigurarDataGridViewReporteEmpleados();
                         dgvResultadosReportes.DataSource = empleados;
+                        dgvResultadosReportes.Refresh();
                         break;
 
                     default:
@@ -565,8 +582,16 @@ namespace SistemaDeGestionPersonal
 
         private void cbxCargarReporte_Click(object sender, EventArgs e)
         {
-            string tipo = comboBox1.SelectedItem?.ToString();
-            cbxCargarReporte.Visible = (tipo == "Empleados por cargo");
+
+        }
+
+        private void cbxCargarReporte_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+           
         }
     }
 }

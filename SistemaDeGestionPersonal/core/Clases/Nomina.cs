@@ -10,6 +10,7 @@ namespace SistemaDeGestionPersonal.core.Clases
     internal class Nomina
     {
         private int empleadoId;
+        private int cargoId;
         private string nombreCompleto;
         private decimal salarioBase;
         private int diasLaborables;
@@ -22,6 +23,8 @@ namespace SistemaDeGestionPersonal.core.Clases
         private decimal pagoNeto;
 
         public int EmpleadoId { get => empleadoId; set => empleadoId = value; }
+
+        public int CargoId { get => cargoId; set => cargoId = value; }
         public string NombreCompleto { get => nombreCompleto; set => nombreCompleto = value; }
         public decimal SalarioBase { get => salarioBase; set => salarioBase = value; }
         public int DiasLaborables { get => diasLaborables; set => diasLaborables = value; }

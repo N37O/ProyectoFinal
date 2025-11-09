@@ -430,13 +430,12 @@
             // 
             cbxCargarReporte.BackColor = SystemColors.ScrollBar;
             cbxCargarReporte.FormattingEnabled = true;
-            cbxCargarReporte.Items.AddRange(new object[] { "Jefe", "Gerente", "Empleado" });
-            cbxCargarReporte.Location = new Point(154, 173);
+            cbxCargarReporte.Items.AddRange(new object[] { "Asistencias", "Planillas", "Empleados por Cargos" });
+            cbxCargarReporte.Location = new Point(154, 181);
             cbxCargarReporte.Name = "cbxCargarReporte";
             cbxCargarReporte.Size = new Size(191, 28);
             cbxCargarReporte.TabIndex = 29;
-            cbxCargarReporte.SelectedIndexChanged += cbxCargarReporte_SelectedIndexChanged;
-            cbxCargarReporte.Click += cbxCargarReporte_Click;
+            cbxCargarReporte.SelectedIndexChanged += cbxCargarReporte_SelectedIndexChanged_1;
             // 
             // label15
             // 
@@ -488,6 +487,7 @@
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(191, 28);
             comboBox1.TabIndex = 15;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // label14
             // 
