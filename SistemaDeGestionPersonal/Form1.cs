@@ -373,6 +373,7 @@ namespace SistemaDeGestionPersonal
         private void btnGenerarReporte_Click_1(object sender, EventArgs e)
         {
             string tipo = comboBox1.SelectedItem?.ToString();
+
             if (string.IsNullOrEmpty(tipo))
             {
                 MessageBox.Show("Seleccione un tipo de reporte.", "Aviso",
@@ -595,38 +596,59 @@ namespace SistemaDeGestionPersonal
         {
             try
             {
-                // Verificar si hay datos en el grid
-                if (dgvAsistencias.Rows.Count == 0)
+                // Verificar si hay datos en el grid de reportes
+                if (dgvResultadosReportes.Rows.Count == 0)
                 {
-                    MessageBox.Show("No hay datos para exportar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("No hay datos para exportar. Genera un reporte primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 // Crear un nuevo libro de Excel
                 using (var workbook = new XLWorkbook())
                 {
-                    var worksheet = workbook.Worksheets.Add("Asistencias");
+                    var worksheet = workbook.Worksheets.Add("Reporte");  // Nombre genérico para cualquier reporte
 
                     // Agregar encabezados (usando los HeaderText de las columnas visibles)
-                    for (int i = 0; i < dgvAsistencias.Columns.Count; i++)
+                    for (int i = 0; i < dgvResultadosReportes.Columns.Count; i++)
                     {
-                        if (dgvAsistencias.Columns[i].Visible)
+                        if (dgvResultadosReportes.Columns[i].Visible)
                         {
-                            worksheet.Cell(1, i + 1).Value = dgvAsistencias.Columns[i].HeaderText;
+                            worksheet.Cell(1, i + 1).Value = dgvResultadosReportes.Columns[i].HeaderText;
                         }
                     }
 
                     // Agregar filas de datos
-                    for (int row = 0; row < dgvAsistencias.Rows.Count; row++)
+                    for (int row = 0; row < dgvResultadosReportes.Rows.Count; row++)
                     {
-                        for (int col = 0; col < dgvAsistencias.Columns.Count; col++)
+                        for (int col = 0; col < dgvResultadosReportes.Columns.Count; col++)
                         {
-                            if (dgvAsistencias.Columns[col].Visible)
+                            if (dgvResultadosReportes.Columns[col].Visible)
                             {
-                                var cellValue = dgvAsistencias.Rows[row].Cells[col].Value;
+                                var cellValue = dgvResultadosReportes.Rows[row].Cells[col].Value;
                                 worksheet.Cell(row + 2, col + 1).Value = cellValue?.ToString() ?? "";
                             }
                         }
+                    }
+
+                    var salarioColumn = worksheet.Columns().FirstOrDefault(c => c.Cell(1).Value.ToString() == "Salario Base");
+                    if (salarioColumn != null)
+                    {
+                        salarioColumn.Style.NumberFormat.Format = "$#,##0.00";
+                    }
+                    var descuentoTardeColumn = worksheet.Columns().FirstOrDefault(c => c.Cell(1).Value.ToString() == "Desc. Tardes");
+                    if (descuentoTardeColumn != null)
+                    {
+                        descuentoTardeColumn.Style.NumberFormat.Format = "$#,##0.00";
+                    }
+                    var descuentoAusenteColumn = worksheet.Columns().FirstOrDefault(c => c.Cell(1).Value.ToString() == "Desc. Ausencias");
+                    if (descuentoAusenteColumn != null)
+                    {
+                        descuentoAusenteColumn.Style.NumberFormat.Format = "$#,##0.00";
+                    }
+                    var pagoNetoColumn = worksheet.Columns().FirstOrDefault(c => c.Cell(1).Value.ToString() == "Pago Neto");
+                    if (pagoNetoColumn != null)
+                    {
+                        pagoNetoColumn.Style.NumberFormat.Format = "$#,##0.00";
                     }
 
                     // Autoajustar columnas para mejor visualización
@@ -634,7 +656,7 @@ namespace SistemaDeGestionPersonal
 
                     // Definir la ruta del archivo (ej. en el escritorio)
                     string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                    string fileName = $"Asistencias_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.xlsx";
+                    string fileName = $"Reporte_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.xlsx";
                     string filePath = Path.Combine(desktopPath, fileName);
 
                     // Guardar el archivo
@@ -649,6 +671,7 @@ namespace SistemaDeGestionPersonal
                 MessageBox.Show($"Error al generar el archivo Excel: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void label15_Click(object sender, EventArgs e)
         {
