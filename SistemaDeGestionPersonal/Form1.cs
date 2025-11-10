@@ -1,4 +1,4 @@
-using ClosedXML.Excel;
+ï»¿using ClosedXML.Excel;
 using SistemaDeGestionPersonal.core.Clases;
 using SistemaDeGestionPersonal.core.DAO;
 
@@ -31,7 +31,7 @@ namespace SistemaDeGestionPersonal
         // Estado
         private int empleadoSeleccionadoId = -1;
 
-        #region Configuración de DataGridViews
+        #region ConfiguraciÃ³n de DataGridViews
 
         private void ConfigurarDataGridViews()
         {
@@ -41,7 +41,7 @@ namespace SistemaDeGestionPersonal
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "ID", Visible = false });
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Nombre" });
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DUI", HeaderText = "DUI" });
-            dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Telefono", HeaderText = "Teléfono" });
+            dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Telefono", HeaderText = "TelÃ©fono" });
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Estado", HeaderText = "Estado" });
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreDepartamento", HeaderText = "Departamento" });
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCargo", HeaderText = "Cargo" });
@@ -62,7 +62,7 @@ namespace SistemaDeGestionPersonal
             dgvResultadosReportes.Columns.Clear();
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Empleado" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalarioBase", HeaderText = "Salario Base", DefaultCellStyle = { Format = "C2" } });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasPresente", HeaderText = "Días Presente" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasPresente", HeaderText = "DÃ­as Presente" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasJustificados", HeaderText = "Justificados" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasTarde", HeaderText = "Tardes" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasAusentes", HeaderText = "Ausencias" });
@@ -113,7 +113,7 @@ namespace SistemaDeGestionPersonal
 
         private void CargarAsistencias()
         {
-            // Aquí cargarías con JOIN para NombreEmpleado, pero por simplicidad:
+            // AquÃ­ cargarÃ­as con JOIN para NombreEmpleado, pero por simplicidad:
             var asistencias = asistenciaDAO.GetAll();
             foreach (var a in asistencias)
             {
@@ -167,7 +167,7 @@ namespace SistemaDeGestionPersonal
             {
                 if (!int.TryParse(txtIdEmpleado.Text, out int empId))
                 {
-                    MessageBox.Show("Ingrese un ID de empleado válido.");
+                    MessageBox.Show("Ingrese un ID de empleado vÃ¡lido.");
                     return;
                 }
 
@@ -272,11 +272,11 @@ namespace SistemaDeGestionPersonal
                 // 2. Obtener el objeto Empleado directamente del DataGridView
                 if (dgvEmpleados.CurrentRow.DataBoundItem is Empleado empleado)
                 {
-                    // 3. Abrir el formulario de actualización pasando el OBJETO COMPLETO
+                    // 3. Abrir el formulario de actualizaciÃ³n pasando el OBJETO COMPLETO
                     var frm = new frmActualizar(empleado);
                     if (frm.ShowDialog() == DialogResult.OK)
                     {
-                        // 4. Recargar la lista si se guardó con éxito
+                        // 4. Recargar la lista si se guardÃ³ con Ã©xito
                         CargarEmpleados();
                         LimpiarCamposEmpleado();
                         empleadoSeleccionadoId = -1;
@@ -302,7 +302,7 @@ namespace SistemaDeGestionPersonal
             // Obtener el objeto Empleado directamente del DataGridView
             if (dgvEmpleados.CurrentRow.DataBoundItem is Empleado empleado)
             {
-                if (MessageBox.Show("¿Desea dar de baja a este empleado?\nSe marcará como inactivo (no se eliminará).", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Â¿Desea dar de baja a este empleado?\nSe marcarÃ¡ como inactivo (no se eliminarÃ¡).", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     try
                     {
@@ -340,7 +340,7 @@ namespace SistemaDeGestionPersonal
             {
                 if (!int.TryParse(txtIdEmpleado.Text, out int empId))
                 {
-                    MessageBox.Show("Ingrese un ID de empleado válido.");
+                    MessageBox.Show("Ingrese un ID de empleado vÃ¡lido.");
                     return;
                 }
 
@@ -389,7 +389,7 @@ namespace SistemaDeGestionPersonal
                         var nominaService = new NominaDAO();
                         var nomina = nominaService.CalcularNominaMensual(dtpDesde.Value);
 
-                        //Filtrar por cargo si está seleccionado
+                        //Filtrar por cargo si estÃ¡ seleccionado
                             if (cargoIdSeleccionado.HasValue)
                             nomina = nomina.Where(n => n.CargoId == cargoIdSeleccionado.Value).ToList();
 
@@ -468,7 +468,7 @@ namespace SistemaDeGestionPersonal
 
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Nombre" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DUI", HeaderText = "DUI" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Telefono", HeaderText = "Teléfono" });
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Telefono", HeaderText = "TelÃ©fono" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Estado", HeaderText = "Estado" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreDepartamento", HeaderText = "Departamento" });
             dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCargo", HeaderText = "Cargo" });
@@ -492,15 +492,98 @@ namespace SistemaDeGestionPersonal
             dgvResultadosReportes.AutoGenerateColumns = false;
             dgvResultadosReportes.Columns.Clear();
 
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "NombreCompleto", HeaderText = "Empleado" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalarioBase", HeaderText = "Salario Base", DefaultCellStyle = { Format = "C2" } });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasPresentes", HeaderText = "Días Presente" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasJustificados", HeaderText = "Justificados" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasTarde", HeaderText = "Tardes" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DiasAusentes", HeaderText = "Ausencias" });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DescuentosTarde", HeaderText = "Desc. Tardes", DefaultCellStyle = { Format = "C2" } });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DescuentosAusente", HeaderText = "Desc. Ausencias", DefaultCellStyle = { Format = "C2" } });
-            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PagoNeto", HeaderText = "Pago Neto", DefaultCellStyle = { Format = "C2" } });
+            // Empleado
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "NombreCompleto",
+                HeaderText = "Empleado",
+                DataPropertyName = "NombreCompleto",
+                Width = 200
+            });
+
+            // Salario Base
+            var colSalario = new DataGridViewTextBoxColumn
+            {
+                Name = "SalarioBase",
+                HeaderText = "Salario Base",
+                DataPropertyName = "SalarioBase",
+                Width = 120,
+                DefaultCellStyle = { Format = "'USD' #,##0.00", Alignment = DataGridViewContentAlignment.MiddleCenter }
+            };
+            dgvResultadosReportes.Columns.Add(colSalario);
+
+            // DÃ­as Presente
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "DiasPresentes",
+                HeaderText = "DÃ­as Presente",
+                DataPropertyName = "DiasPresentes",
+                Width = 80,
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+            });
+
+            // Justificados
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "DiasJustificados",
+                HeaderText = "Justificados",
+                DataPropertyName = "DiasJustificados",
+                Width = 80,
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+            });
+
+            // Tardes
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "DiasTarde",
+                HeaderText = "Tardes",
+                DataPropertyName = "DiasTarde",
+                Width = 60,
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+            });
+
+            // Ausentes
+            dgvResultadosReportes.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "DiasAusentes",
+                HeaderText = "Ausentes",
+                DataPropertyName = "DiasAusentes",
+                Width = 60,
+                DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+            });
+
+            // Desc. Ausente
+            var colDescAusente = new DataGridViewTextBoxColumn
+            {
+                Name = "DescuentosAusente",
+                HeaderText = "Desc. Ausente",
+                DataPropertyName = "DescuentosAusente",
+                Width = 100,
+                DefaultCellStyle = { Format = "'USD' #,##0.00", Alignment = DataGridViewContentAlignment.MiddleCenter }
+            };
+            dgvResultadosReportes.Columns.Add(colDescAusente);
+
+            // Desc. Tarde
+            var colDescTarde = new DataGridViewTextBoxColumn
+            {
+                Name = "DescuentosTarde",
+                HeaderText = "Desc. Tarde",
+                DataPropertyName = "DescuentosTarde",
+                Width = 100,
+                DefaultCellStyle = { Format = "'USD' #,##0.00", Alignment = DataGridViewContentAlignment.MiddleCenter }
+            };
+            dgvResultadosReportes.Columns.Add(colDescTarde);
+
+            // Pago Neto
+            var colPagoNeto = new DataGridViewTextBoxColumn
+            {
+                Name = "PagoNeto",
+                HeaderText = "Pago Neto",
+                DataPropertyName = "PagoNeto",
+                Width = 100,
+                DefaultCellStyle = { Format = "'USD' #,##0.00", Alignment = DataGridViewContentAlignment.MiddleCenter }
+            };
+            dgvResultadosReportes.Columns.Add(colPagoNeto);
         }
 
         private void dgvAsistencias_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -546,7 +629,7 @@ namespace SistemaDeGestionPersonal
                         }
                     }
 
-                    // Autoajustar columnas para mejor visualización
+                    // Autoajustar columnas para mejor visualizaciÃ³n
                     worksheet.Columns().AdjustToContents();
 
                     // Definir la ruta del archivo (ej. en el escritorio)
@@ -557,8 +640,8 @@ namespace SistemaDeGestionPersonal
                     // Guardar el archivo
                     workbook.SaveAs(filePath);
 
-                    // Mostrar mensaje de éxito
-                    MessageBox.Show($"Archivo Excel generado correctamente en: {filePath}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Mostrar mensaje de Ã©xito
+                    MessageBox.Show($"Archivo Excel generado correctamente en: {filePath}", "Ã‰xito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
