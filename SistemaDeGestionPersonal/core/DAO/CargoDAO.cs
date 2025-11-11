@@ -15,6 +15,8 @@ namespace SistemaDeGestionPersonal.core.DAO
         private SqlConnection con = null;
         private SqlCommand command = null;
 
+        // Elimina un registro de la tabla Cargo según su ID.
+        // Retorna true si se eliminó exactamente un registro.
         public bool Delete(int id)
         {
             try
@@ -31,6 +33,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             }
         }
 
+        // Obtiene todos los cargos, opcionalmente filtrando por nombre.
         public List<Cargo> GetAll(string filtro = "")
         {
             var lista = new List<Cargo>();
@@ -54,6 +57,8 @@ namespace SistemaDeGestionPersonal.core.DAO
                     command.Parameters.Add("@f", SqlDbType.NVarChar, 100).Value = $"%{filtro}%";
 
                 rd = command.ExecuteReader();
+                // Se mapean los resultados a objetos Cargo.
+
                 while (rd.Read())
                 {
                     lista.Add(Map(rd));
@@ -68,6 +73,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             return lista;
         }
 
+        // Convierte una fila del SqlDataReader en un objeto Cargo.
         private Cargo Map(SqlDataReader rd) =>  new Cargo
          {
             Id = rd.GetInt32(0),
@@ -75,9 +81,10 @@ namespace SistemaDeGestionPersonal.core.DAO
             Nivel = rd.IsDBNull(2) ? null : rd.GetString(2),
             SalarioBase = rd.GetDecimal(3)
         };
-              
 
 
+        // Obtiene un cargo por su ID.
+        // Retorna null si no se encuentra.
         public Cargo GetById(int id)
         {
             SqlDataReader rd = null;
@@ -86,6 +93,7 @@ namespace SistemaDeGestionPersonal.core.DAO
                 con = OpenDb();
                 command = new SqlCommand("SELECT id, nombre, nivel, salarioBase FROM Cargo WHERE id = @id", con);
                 command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                // Se usa CommandBehavior.SingleRow para optimizar la lectura de una sola fila.
                 rd = command.ExecuteReader(CommandBehavior.SingleRow);
                 if (!rd.Read())
                 {
@@ -102,6 +110,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             }
         }
 
+        // Inserta un nuevo cargo en la base de datos y retorna el ID generado.
         public int Insert(Cargo cargo)
         {
             try
@@ -126,6 +135,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             }
         }
 
+        // Actualiza los datos de un cargo existente en la base de datos
         public bool Update(Cargo cargo)
         {
             try

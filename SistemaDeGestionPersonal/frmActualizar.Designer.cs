@@ -197,6 +197,7 @@
             Controls.Add(label1);
             Name = "frmActualizar";
             Text = "Actualizar";
+            Load += frmActualizar_Load;
             ResumeLayout(false);
             PerformLayout();
         }

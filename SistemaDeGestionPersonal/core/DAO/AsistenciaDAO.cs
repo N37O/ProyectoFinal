@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.Data.SqlClient;
 using SistemaDeGestionPersonal.core.Clases;
 using SistemaDeGestionPersonal.core.Lip;
 using System;
@@ -15,11 +16,15 @@ namespace SistemaDeGestionPersonal.core.DAO
     {
         private SqlConnection con = null;
         private SqlCommand command = null;
+
+        // Elimina un registro de asistencia por su ID.
         public bool Delete(int id)
         {
             try { con = OpenDb(); command = new SqlCommand("DELETE FROM Asistencia WHERE id = @id", con); command.Parameters.Add("@id", SqlDbType.Int).Value = id; return command.ExecuteNonQuery() == 1; }
             finally { command?.Dispose(); CloseDb(); }
         }
+
+        //Obtiene todas las asistencias, opcionalmente filtrando por fecha o estado.
 
         public List<Asistencias> GetAll(string filtro = "")
         {
@@ -47,6 +52,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             return lista;
         }
 
+        // Obtiene una asistencia por su ID.
         public Asistencias GetById(int id)
         {
             SqlDataReader rd = null;
@@ -70,6 +76,7 @@ namespace SistemaDeGestionPersonal.core.DAO
             finally { rd?.Close(); command?.Dispose(); CloseDb(); }
         }
 
+        // Inserta un nuevo registro de asistencia y retorna el ID generado.
         public int Insert(Asistencias asistencia)
         {
             try
@@ -94,7 +101,7 @@ namespace SistemaDeGestionPersonal.core.DAO
         }
 
 
-
+        // Actualiza un registro de asistencia existente.
         public bool Update(Asistencias asistencia)
         {
             try

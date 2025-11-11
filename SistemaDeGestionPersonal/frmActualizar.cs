@@ -30,6 +30,7 @@ namespace SistemaDeGestionPersonal
             CargarDatos();
         }
 
+        // Llena los combos de cargo, departamento y estado con datos desde la base.
         private void CargarCombos()
         {
             var cargos = cargoDAO.GetAll();
@@ -44,6 +45,7 @@ namespace SistemaDeGestionPersonal
             cbxEstado.Items.AddRange(new string[] { "Activo", "Desactivo" });
         }
 
+        // Llena los controles del formulario con los datos del empleado.
         private void CargarDatos()
         {
             txtNombre.Text = empleado.NombreCompleto;
@@ -54,6 +56,7 @@ namespace SistemaDeGestionPersonal
             cbxCargo.SelectedValue = empleado.CargoId;
         }
 
+        // Evento que se ejecuta al hacer clic en el botón "Actualizar".
         private void btnActualisar_Click(object sender, EventArgs e)
         {
             empleado.NombreCompleto = txtNombre.Text;
@@ -73,10 +76,16 @@ namespace SistemaDeGestionPersonal
                 MessageBox.Show("Error al actualizar el empleado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        // Evento que se ejecuta al hacer clic en el botón "Cancelar".
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void frmActualizar_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

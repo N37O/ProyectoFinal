@@ -15,12 +15,14 @@ namespace SistemaDeGestionPersonal.core.DAO
         private SqlConnection con = null;
         private SqlCommand command = null;
 
+        // Elimina un departamento por su ID
         public bool Delete(int id)
         {
             try { con = OpenDb(); command = new SqlCommand("DELETE FROM Departamento WHERE id = @id", con); command.Parameters.Add("@id", SqlDbType.Int).Value = id; return command.ExecuteNonQuery() == 1; }
             finally { command?.Dispose(); CloseDb(); }
         }
 
+        // Obtiene todos los departamentos, opcionalmente filtrando por nombre.
         public List<Departamentos> GetAll(string filtro = "")
         {
             var List = new List<Departamentos>(); 
@@ -29,9 +31,13 @@ namespace SistemaDeGestionPersonal.core.DAO
             {
                 con = OpenDb();
                 string sql = "SELECT id, nombre FROM Departamento /** where **/ ORDER BY id";
+
+                // Si hay filtro, se agrega cláusula WHERE.
                 if (!string.IsNullOrEmpty(filtro)) sql = sql.Replace("/** where **/", " WHERE nombre LIKE @f");
                 else sql = sql.Replace("/** where **/", "");
                 command = new SqlCommand(sql, con);
+
+                // Se agrega el parámetro de filtro si aplica.
                 if (!string.IsNullOrEmpty(filtro)) command.Parameters.Add("@f", SqlDbType.NVarChar, 100).Value = $"%{filtro}%";
                 rd = command.ExecuteReader();
                 while (rd.Read()) List.Add(new Departamentos { Id = rd.GetInt32(0), Nombre = rd.GetString(1) });
@@ -40,6 +46,8 @@ namespace SistemaDeGestionPersonal.core.DAO
             return List;
         }
 
+        // Obtiene un departamento por su ID.
+        // Retorna null si no se encuentra.
         public Departamentos GetById(int id)
         {
             SqlDataReader rd = null;
@@ -54,12 +62,16 @@ namespace SistemaDeGestionPersonal.core.DAO
             finally { rd?.Close(); command?.Dispose(); CloseDb(); }
         }
 
+        // Inserta un nuevo departamento y retorna el ID generado.
 
         public int Insert(Departamentos departamento)
         {
             try { con = OpenDb(); command = new SqlCommand("INSERT INTO Departamento (nombre) OUTPUT INSERTED.id VALUES (@nombre)", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = departamento.Nombre; return (int)command.ExecuteScalar(); }
             finally { command?.Dispose(); CloseDb(); }
         }
+
+        // Actualiza el nombre de un departamento por su ID.
+        // Retorna true si se actualizó exactamente un registro.
         public bool Update(Departamentos departamento)
         {
             try { con = OpenDb(); command = new SqlCommand("UPDATE Departamento SET nombre = @nombre WHERE id = @id", con); command.Parameters.Add("@nombre", SqlDbType.NVarChar, 100).Value = departamento.Nombre; command.Parameters.Add("@id", SqlDbType.Int).Value = departamento.Id; return command.ExecuteNonQuery() == 1; }

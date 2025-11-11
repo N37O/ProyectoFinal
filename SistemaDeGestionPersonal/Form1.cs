@@ -217,16 +217,20 @@ namespace SistemaDeGestionPersonal
 
         #endregion
 
+        // Evento que se ejecuta al hacer clic en el botón "Agregar".
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             try
             {
+                // Validación: verifica que los campos obligatorios no estén vacíos.
+
                 if (string.IsNullOrWhiteSpace(txtNombre.Text) || cbxCargo.SelectedValue == null || cbxDepartamento.SelectedValue == null)
                 {
                     MessageBox.Show("Complete los campos obligatorios: Nombre, Cargo y Departamento.");
                     return;
                 }
 
+                // Crea un nuevo objeto Empleado con los datos del formulario.
                 var emp = new Empleado
                 {
                     NombreCompleto = txtNombre.Text,
@@ -237,6 +241,7 @@ namespace SistemaDeGestionPersonal
                     CargoId = (int)cbxCargo.SelectedValue
                 };
 
+                // Inserta el nuevo empleado en la base de datos.
                 empleadoDAO.Insert(emp);
                 MessageBox.Show("Empleado registrado correctamente.");
                 CargarEmpleados();
@@ -334,21 +339,26 @@ namespace SistemaDeGestionPersonal
 
         }
 
+        // Evento que se ejecuta al hacer clic en el botón "Enviar" para registrar asistencia.
         private void btnEnviar_Click(object sender, EventArgs e)
         {
             try
             {
+                // Validación: verifica que el ID del empleado sea un número entero válido.
+
                 if (!int.TryParse(txtIdEmpleado.Text, out int empId))
                 {
                     MessageBox.Show("Ingrese un ID de empleado válido.");
                     return;
                 }
+                // Validación: verifica que se haya seleccionado un estado de asistencia.
 
                 if (cbxPermiso.SelectedItem == null)
                 {
                     MessageBox.Show("Seleccione un estado de asistencia.");
                     return;
                 }
+                // Crea un nuevo objeto Asistencias con los datos del formulario.
 
                 var asistencia = new Asistencias
                 {
@@ -460,7 +470,7 @@ namespace SistemaDeGestionPersonal
             }
 
         }
-
+        //Cargar DataGridView Reporte Empleados
         private void ConfigurarDataGridViewReporteEmpleados()
         {
             dgvResultadosReportes.AutoGenerateColumns = false;
